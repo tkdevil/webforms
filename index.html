@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Parallax Scroller</title>
+    <style>
+
+        body { margin: 0; }
+        canvas {
+            display: block;
+            background-color: #222222;
+            margin: 0%
+        }
+
+        #roundedBoxOverlay {
+            position: absolute;
+            top: 15vw;
+            left: 30%;
+            right: 30%;
+            text-align: center;
+            font-size: 200%;
+            border-radius: 50px;
+            color: #FFFFFF;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        #roundedBoxOverlay p {
+            margin: 5%;
+        }
+
+    </style>
+</head>
+<body>
+
+    <canvas id="game-canvas"></canvas>
+    <div id="roundedBoxOverlay">
+        <p style="font-size: 100px;">Plants.</p>
+        <p>We have them.</p>
+    </div>
+
+
+    <script src="pixi.js"></script>
+    <script type="text/javascript">
+        var _w = window.innerWidth;
+        var _h = _w/2;
+        
+        const canvas = document.getElementById('game-canvas');
+        app = new PIXI.Application({
+            view: canvas,
+            width: _w,
+            height: _h - 10
+        });
+
+        let loader = PIXI.Loader.shared;
+        loader.add("bg", "resources/plants.jpg");
+        loader.onComplete.add(handleLoadComplete);
+        loader.load();
+        var bg_list = [];
+        let tex_bg;
+        function handleLoadComplete() {
+
+            tex_bg = loader.resources.bg.texture;
+
+            for (i = 0; i < 2; i++) {
+                bg = new PIXI.Sprite(tex_bg);
+                bg.x = i * _w * 3;
+                bg.y = 0;
+                bg.width = _w * 3;
+                bg.height = _h * 4;
+                bg_list.push(bg);
+                app.stage.addChild(bg);
+                console.log(bg.x);
+            }
+
+            var tint = new PIXI.Graphics();
+
+            tint.beginFill(0x000000, 0.5);
+            tint.drawRect(0, 0, _w, _h);
+            app.stage.addChild(tint);
+
+            var g = new PIXI.Graphics();
+            g.beginFill(0x000000, 0.5);
+            // x, y, width, height, radius
+            g.drawRoundedRect(_w*0.2, _h*0.2, _w*0.6, _h*0.6, 100);
+            //app.stage.addChild(g);
+
+            app.ticker.add(animate);
+
+        }
+        
+        let px;
+        let py;
+        setNext();
+        setInterval(setNext, 3000);
+        function setNext() {
+            px = _w * -Math.floor(Math.random() * 3 * 2);
+            py = _h * -Math.floor(Math.random() * 4);
+        }
+
+        function animate() {
+            for (i = 0; i < bg_list.length; i++) {
+                dx = (bg_list[i].x - (px + i * _w * 3)) * -500;
+                dy = (bg_list[i].y - py) * -500;
+                bg_list[i].x += dx * 0.0001;
+                bg_list[i].y += dy * 0.0001;
+            }
+        }
+        
+    
+    </script>
+</body>
+</html>
